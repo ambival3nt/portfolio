@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chris - Full-Stack Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Unbounded:wght@300;400;700;900&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0b;
+      --paper: #f0ebe0;
+      --tape: #c9a84c;
+      --tape-dim: #7a6228;
+      --dust: #1a1a16;
+      --mid: #3a3930;
+      --faint: #2a2a24;
+      --gap: clamp(1.5rem, 4vw, 3rem);
+
+      /* Project accent colours */
+      --ht-glow: #00e5ff;
+      --ht-bg: #050d14;
+      --ht-mid: #0a1e2e;
+      --fl-glow: #7dd3c8;
+      --fl-bg: #091410;
+      --fl-mid: #112820;
+      --ri-glow: #f4a7b9;
+      --ri-bg: #0e080e;
+      --ri-mid: #1e101e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: clamp(15px, 1.1vw, 17px);
+      line-height: 1.65;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--tape);
+      border-radius: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s, width 0.2s, height 0.2s, opacity 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor.big { width: 40px; height: 40px; opacity: 0.4; }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.35;
+    }
+
+    .site-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--gap);
+    }
+
+    /* ─── Header ─── */
+    header {
+      padding: clamp(2rem, 5vw, 4rem) 0 0;
+    }
+
+    .header-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      border-bottom: 1px solid var(--mid);
+      padding-bottom: 1.5rem;
+    }
+
+    .wordmark {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      letter-spacing: -0.03em;
+      line-height: 0.92;
+      color: var(--paper);
+    }
+    .wordmark span { color: var(--tape); }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      padding-bottom: 0.2rem;
+    }
+    .nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav a:hover { opacity: 1; color: var(--tape); }
+    .nav a.resume {
+      color: var(--tape);
+      opacity: 0.8;
+      border: 1px solid var(--tape-dim);
+      padding: 0.15em 0.5em;
+      margin-top: 0.3rem;
+    }
+    .nav a.resume:hover { opacity: 1; background: var(--tape-dim); }
+
+    /* ─── Lede ─── */
+    .lede {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      padding: clamp(3rem, 6vw, 5rem) 0;
+      border-bottom: 1px solid var(--mid);
+    }
+
+    .lede-text h2 {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      line-height: 1.2;
+      color: var(--paper);
+      max-width: 520px;
+    }
+    .lede-text h2 em { color: var(--tape); font-style: normal; }
+
+    .lede-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 1.5rem;
+    }
+    .lede-meta p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      line-height: 1.8;
+      color: var(--paper);
+      opacity: 0.45;
+      letter-spacing: 0.04em;
+    }
+
+    .stack-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2em 0.6em;
+      border: 1px solid var(--mid);
+      color: var(--paper);
+      opacity: 0.55;
+      transition: opacity 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .tag:hover { opacity: 1; border-color: var(--tape); color: var(--tape); }
+
+    /* ─── Projects ─── */
+    .projects-section { padding: clamp(3rem, 6vw, 5rem) 0; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--tape);
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--mid); }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--mid);
+    }
+
+    /* ─── Base card ─── */
+    .project-card {
+      background: var(--ink);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.35s;
+    }
+
+    /* Ambient glow — hidden until hover */
+    .project-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+
+    /* Accent bar */
+    .project-card .bar {
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 0;
+      transition: height 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .project-card:hover .bar { height: 100%; }
+    .project-card:hover::after { opacity: 1; }
+
+    /* ─── Featured layout ─── */
+    .project-card.featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .project-card.featured .bar {
+      width: 0; height: 3px;
+      transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .project-card.featured:hover .bar { width: 100%; height: 3px; }
+
+
+
+    /* Content wrapper — sits above absolute decorative layers */
+    .project-card .card-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      flex: 1;
+    }
+    .project-card.card-fluster,
+    .project-card.card-riff {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Decorative absolute elements must not be grid/flex children */
+    .project-card .screenshot-bg,
+    .project-card .scanlines,
+    .project-card .bar,
+    .project-card .gridbg,
+    .project-card .vignette {
+      position: absolute;
+      pointer-events: none;
+    }
+    /* Featured card: only .card-left and .project-meta are grid children */
+    .project-card.featured {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .project-card.featured .card-left,
+    .project-card.featured .project-meta {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── HeroTube theming ─── */
+    .card-herotube {
+      background: var(--ht-bg);
+    }
+    .card-herotube::after {
+      background: radial-gradient(ellipse 60% 50% at 80% 50%, rgba(0,229,255,0.07) 0%, transparent 70%);
+    }
+    .card-herotube:hover { background: var(--ht-mid); }
+    .card-herotube .bar { background: var(--ht-glow); box-shadow: 0 0 12px var(--ht-glow); }
+    .card-herotube .project-num { color: var(--ht-glow); text-shadow: 0 0 12px rgba(0,229,255,0.5); }
+    .card-herotube .project-title { color: #e0f8ff !important; text-shadow: 0 0 30px rgba(0,229,255,0.4), 0 2px 8px rgba(0,0,0,0.9); }
+    .card-herotube .project-tagline { color: var(--ht-glow); opacity: 0.7; font-style: normal; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .card-herotube .tech-pill { background: rgba(0,229,255,0.07); color: var(--ht-glow); opacity: 0.7; }
+    .card-herotube .project-link { color: var(--ht-glow); border-color: rgba(0,229,255,0.3); }
+    .card-herotube .project-link:hover { border-color: var(--ht-glow); }
+
+    /* scanline effect on herotube */
+    .card-herotube .scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+
+    .card-fluster .screenshot-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('images/fluster.png');
+      background-size: cover;
+      background-position: center top;
+      filter: blur(2px) brightness(0.18) saturate(0.5);
+      transform: scale(1.05);
+      transition: filter 0.5s, transform 0.5s;
+      pointer-events: none;
+    }
+    .card-fluster:hover .screenshot-bg {
+      filter: blur(1.5px) brightness(0.26) saturate(0.7);
+      transform: scale(1.02);
+    }
+
+    /* ─── Fluster theming ─── */
+    .card-fluster {
+      background: var(--fl-bg);
+    }
+    .card-fluster::after {
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(125,211,200,0.06) 0%, transparent 70%);
+    }
+    .card-fluster:hover { background: var(--fl-mid); }
+    .card-fluster .bar { background: var(--fl-glow); }
+    .card-fluster .project-num { color: var(--fl-glow); }
+    .card-fluster .project-title { color: #d8f5f2 !important; text-shadow: 0 2px 12px rgba(0,0,0,0.95), 0 0 20px rgba(125,211,200,0.3); }
+    .card-fluster .project-tagline { color: var(--fl-glow); opacity: 0.65; }
+    .card-fluster .tech-pill { background: rgba(125,211,200,0.07); color: var(--fl-glow); opacity: 0.7; }
+    .card-fluster .project-link { color: var(--fl-glow); border-color: rgba(125,211,200,0.3); }
+    .card-fluster .project-link:hover { border-color: var(--fl-glow); }
+
+    /* grid-dot bg on fluster */
+    .card-fluster .gridbg {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(125,211,200,0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .card-fluster:hover .gridbg { opacity: 1; }
+
+
+    .card-riff .screenshot-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('images/riff.png');
+      background-size: cover;
+      background-position: center 20%;
+      filter: blur(3px) brightness(0.2) saturate(0.5);
+      transform: scale(1.05);
+      transition: filter 0.5s, transform 0.5s;
+      pointer-events: none;
+    }
+    .card-riff:hover .screenshot-bg {
+      filter: blur(2px) brightness(0.28) saturate(0.7);
+      transform: scale(1.02);
+    }
+
+    /* ─── Riff theming ─── */
+    .card-riff {
+      background: var(--ri-bg);
+    }
+    .card-riff::after {
+      background: radial-gradient(ellipse 70% 60% at 20% 80%, rgba(244,167,185,0.09) 0%, transparent 70%);
+    }
+    .card-riff:hover { background: var(--ri-mid); }
+    .card-riff .bar { background: var(--ri-glow); box-shadow: 0 0 10px rgba(244,167,185,0.35); }
+    .card-riff .project-num { color: var(--ri-glow); }
+    .card-riff .project-title { color: #fde8f0; }
+    .card-riff .project-tagline { color: var(--ri-glow); opacity: 0.65; font-style: italic; }
+    .card-riff .tech-pill { background: rgba(244,167,185,0.08); color: var(--ri-glow); opacity: 0.7; }
+    .card-riff .project-link.dim { color: var(--ri-glow); opacity: 0.3; border-color: rgba(244,167,185,0.2); }
+
+    /* warm vignette on riff */
+    .card-riff .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 100% 100% at 50% 100%, rgba(232,132,90,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ─── Shared card elements ─── */
+    .project-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      opacity: 0.7;
+    }
+    .project-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--paper);
+    }
+    .project-tagline {
+      font-family: 'Newsreader', serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      opacity: 0.65;
+    }
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--paper);
+      opacity: 0.5;
+      line-height: 1.7;
+      max-width: 44ch;
+    }
+    .project-meta { display: flex; flex-direction: column; gap: 1.2rem; }
+    .project-links { display: flex; gap: 1rem; margin-top: auto; padding-top: 1rem; }
+    .project-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-bottom: 1px solid;
+      padding-bottom: 1px;
+      transition: opacity 0.2s;
+    }
+    .project-link:hover { opacity: 0.8; }
+    .project-link.dim { opacity: 0.3; }
+
+    .tech-row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .tech-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15em 0.5em;
+    }
+
+    /* ─── About / Contact ─── */
+    .bottom-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--mid);
+      border-top: 1px solid var(--mid);
+    }
+    .strip-cell { background: var(--ink); padding: 2.5rem; }
+    .strip-cell h3 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--tape);
+      margin-bottom: 1.2rem;
+    }
+    .strip-cell p {
+      font-size: 0.9rem;
+      opacity: 0.55;
+      line-height: 1.75;
+      max-width: 48ch;
+    }
+
+    .contact-links { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+    .contact-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--paper);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .contact-link::before { content: '→'; color: var(--tape); font-size: 0.8em; }
+    .contact-link:hover { opacity: 1; color: var(--tape); }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 2rem 0;
+      border-top: 1px solid var(--faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      opacity: 0.2;
+    }
+
+    /* ─── Animations ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .wordmark { animation: rise 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+    .nav       { animation: rise 0.9s 0.15s cubic-bezier(0.16,1,0.3,1) both; }
+    .lede-text { animation: rise 0.9s 0.25s cubic-bezier(0.16,1,0.3,1) both; }
+    .lede-meta { animation: rise 0.9s 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 760px) {
+      .header-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .nav { flex-direction: row; align-items: flex-start; flex-wrap: wrap; }
+      .lede { grid-template-columns: 1fr; gap: 2rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: auto; display: flex; flex-direction: column; }
+      .bottom-strip { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.8rem; text-align: center; }
+    }
+  
+    /* ─── HeroTube screenshot bg ─── */
+    .card-herotube .screenshot-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('images/herotube.png');
+      background-size: cover;
+      background-position: center 30%;
+      filter: blur(3px) brightness(0.22) saturate(0.7);
+      transform: scale(1.05);
+      transition: filter 0.5s, transform 0.5s;
+      pointer-events: none;
+    }
+    .card-herotube:hover .screenshot-bg {
+      filter: blur(2px) brightness(0.3) saturate(0.9);
+      transform: scale(1.02);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<div class="site-wrap">
+
+  <header>
+    <div class="header-inner">
+      <div class="wordmark">C<span>.</span></div>
+      <nav class="nav">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="resume.html" class="resume">Résumé</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="lede">
+    <div class="lede-text">
+      <h2>Full-stack developer.<br><em>Concept-first.</em><br>Seriously.</h2>
+    </div>
+    <div class="lede-meta">
+      <p>
+        NORTH BAY, ON, CANADA<br>
+        B.SC. COMPUTER SCIENCE — NIPISSING<br>
+        B.A. SOCIOLOGY — NIPISSING<br>
+        YASKAWA ADVANCED INDUSTRIAL ROBOTICS
+      </p>
+      <div class="stack-list">
+        <span class="tag">React</span>
+        <span class="tag">Vue.js</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">Node.js</span>
+        <span class="tag">Python</span>
+        <span class="tag">PHP / Laravel</span>
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">Flutter</span>
+        <span class="tag">Firebase</span>
+        <span class="tag">Linux</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="projects-section" id="work">
+    <div class="section-label">Selected work</div>
+
+    <div class="projects-grid">
+
+      <!-- HeroTube -->
+      <div class="project-card featured card-herotube reveal">
+        <div class="screenshot-bg"></div>
+        <div class="scanlines"></div>
+        <div class="bar"></div>
+        <div class="card-left">
+          <div class="project-num">01 / 03</div>
+          <div class="project-title">HeroTube</div>
+          <div class="project-tagline">▶ ANY SONG. ANY BAND. YOUR FINGERS.</div>
+        </div>
+        <div class="project-meta">
+          <p class="project-desc">
+            A browser-based rhythm game that converts YouTube links into playable band-style tracks.
+            Human-in-the-loop beatmap generation via Gemini, with a community fine-tuning pipeline
+            built for Discord rhythm-game communities. Architecturally comparable to — and advancing on —
+            the TensorHero Berkeley capstone model.
+          </p>
+          <div class="tech-row">
+            <span class="tech-pill">Firebase</span>
+            <span class="tech-pill">Gemini API</span>
+            <span class="tech-pill">YouTube API</span>
+            <span class="tech-pill">React</span>
+            <span class="tech-pill">Node.js</span>
+          </div>
+          <div class="project-links">
+            <a class="project-link" href="https://herotube.baby" target="_blank" rel="noopener">Live ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fluster -->
+      <div class="project-card card-fluster reveal">
+        <div class="screenshot-bg"></div>
+        <div class="gridbg"></div>
+        <div class="bar"></div>
+        <div class="card-content">
+          <div class="project-num">02 / 03</div>
+          <div class="project-title">Butter</div>
+          <div class="project-tagline">Ship Flutter demos like you mean it.</div>
+          <p class="project-desc">
+            Demo distribution tooling for Flutter developers. Automates multi-platform builds via
+            GitHub Actions and serves device-appropriate builds from a single shareable link.
+            Tiered SaaS pricing. Solves a real gap in the Flutter deployment workflow.
+          </p>
+          <div class="tech-row">
+            <span class="tech-pill">Flutter</span>
+            <span class="tech-pill">GitHub Actions</span>
+            <span class="tech-pill">Node.js</span>
+            <span class="tech-pill">Firebase</span>
+          </div>
+          <div class="project-links">
+            <a class="project-link" href="http://fluster.onrender.com" target="_blank" rel="noopener">Live ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riff -->
+      <div class="project-card card-riff reveal">
+        <div class="screenshot-bg"></div>
+        <div class="vignette"></div>
+        <div class="bar"></div>
+        <div class="card-content">
+          <div class="project-num">03 / 03</div>
+          <div class="project-title">Riff</div>
+          <div class="project-tagline">Digital busking for the real world.</div>
+          <p class="project-desc">
+            Flutter-based livestreaming and digital busking platform with integrated tipping.
+            Built for performers who want a direct line to their audience — no platform tax,
+            no content strategy required.
+          </p>
+          <div class="tech-row">
+          <span class="tech-pill">Butter</span>
+          <span class="tech-pill">Firebase</span>
+          <span class="tech-pill">Stripe</span>
+          <span class="tech-pill">WebRTC</span>
+        </div>
+        <div class="project-links">
+          <a class="project-link dim" href="#" aria-disabled="true">Coming soon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="bottom-strip" id="about">
+    <div class="strip-cell reveal">
+      <h3>About</h3>
+      <p>
+        I build things that start with an idea nobody has solved cleanly yet.
+        Multi-modal by instinct — music, systems, narrative — with a strong bias toward
+        making the architecture as considered as the interface. Currently available for
+        full-stack and systems roles, and open to contracts with real scope.
+      </p>
+    </div>
+    <div class="strip-cell reveal" id="contact">
+      <h3>Contact</h3>
+      <p>North Bay, ON. Remote-friendly. Occasionally persuadable to relocate.</p>
+      <div class="contact-links">
+        <a class="contact-link" href="mailto:chris.topher.hall@outlook.com">chris.topher.hall@outlook.com</a>
+        <a class="contact-link" href="https://github.com/ambival3nt" target="_blank" rel="noopener">GitHub</a>
+        <a class="contact-link" href="https://www.linkedin.com/in/christopher-hall-a7a338110" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="contact-link" href="resume.html">Résumé</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 binary.psychiatry — north bay, ontario</p>
+    <p>Designed and built from scratch.</p>
+  </footer>
+
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, .tag, .project-card').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

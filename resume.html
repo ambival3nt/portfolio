@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chris — Résumé</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Unbounded:wght@300;400;700;900&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0b;
+      --paper: #f0ebe0;
+      --tape: #c9a84c;
+      --tape-dim: #7a6228;
+      --dust: #1a1a16;
+      --mid: #3a3930;
+      --faint: #2a2a24;
+      --gap: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: clamp(14px, 1vw, 16px);
+      line-height: 1.65;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--tape);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s, width 0.2s, height 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor.big { width: 40px; height: 40px; opacity: 0.4; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 100; opacity: 0.35;
+    }
+
+    .site-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 var(--gap);
+    }
+
+    /* ─── Top bar ─── */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(1.5rem, 4vw, 3rem) 0 1.5rem;
+      border-bottom: 1px solid var(--mid);
+    }
+
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper);
+      text-decoration: none;
+      opacity: 0.4;
+      transition: opacity 0.2s, color 0.2s;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .back-link:hover { opacity: 1; color: var(--tape); }
+
+    .top-bar-right {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      opacity: 0.25;
+    }
+
+    /* ─── Name block ─── */
+    .resume-header {
+      padding: clamp(2.5rem, 5vw, 4rem) 0 2rem;
+      border-bottom: 1px solid var(--mid);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: end;
+    }
+
+    .resume-name {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      letter-spacing: -0.03em;
+      line-height: 0.92;
+    }
+    .resume-name span { color: var(--tape); }
+
+    .resume-title {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      opacity: 0.6;
+      margin-top: 0.8rem;
+    }
+
+    .resume-contact {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      line-height: 2;
+      letter-spacing: 0.05em;
+      opacity: 0.45;
+      text-align: right;
+    }
+    .resume-contact a {
+      color: var(--paper);
+      text-decoration: none;
+      transition: color 0.2s, opacity 0.2s;
+    }
+    .resume-contact a:hover { color: var(--tape); opacity: 1; }
+
+    /* ─── Body layout ─── */
+    .resume-body {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 0 3rem;
+      padding: 3rem 0;
+    }
+
+    /* ─── Section ─── */
+    .section { margin-bottom: 2.5rem; }
+    .section-head {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--tape);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--faint);
+    }
+
+    /* ─── Experience entry ─── */
+    .exp-entry { margin-bottom: 1.8rem; }
+    .exp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.2rem;
+    }
+    .exp-role {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 400;
+      font-size: 0.82rem;
+      letter-spacing: -0.01em;
+      color: var(--paper);
+    }
+    .exp-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      color: var(--tape);
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+    .exp-company {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      opacity: 0.4;
+      margin-bottom: 0.6rem;
+    }
+    .exp-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .exp-bullets li {
+      font-size: 0.85rem;
+      opacity: 0.55;
+      line-height: 1.55;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .exp-bullets li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--tape);
+      opacity: 0.5;
+      font-size: 0.7em;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar .section { margin-bottom: 2rem; }
+
+    .skill-group { margin-bottom: 1.2rem; }
+    .skill-group-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.35;
+      margin-bottom: 0.4rem;
+    }
+    .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .skill-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15em 0.5em;
+      border: 1px solid var(--mid);
+      color: var(--paper);
+      opacity: 0.5;
+      transition: opacity 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .skill-tag:hover { opacity: 0.9; border-color: var(--tape); color: var(--tape); }
+
+    .edu-entry { margin-bottom: 1.2rem; }
+    .edu-degree {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 400;
+      font-size: 0.72rem;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin-bottom: 0.15rem;
+    }
+    .edu-school {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      opacity: 0.35;
+    }
+
+    .cert-entry {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      opacity: 0.45;
+      line-height: 1.7;
+    }
+
+    /* ─── Project entries in resume ─── */
+    .proj-entry { margin-bottom: 1.4rem; }
+    .proj-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.15rem;
+    }
+    .proj-name {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 400;
+      font-size: 0.82rem;
+    }
+    .proj-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--tape);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      opacity: 0.7;
+    }
+    .proj-link:hover { opacity: 1; }
+    .proj-desc {
+      font-size: 0.83rem;
+      opacity: 0.5;
+      line-height: 1.55;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 2rem 0;
+      border-top: 1px solid var(--faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      opacity: 0.2;
+    }
+
+    /* ─── Animations ─── */
+    .reveal {
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .top-bar    { animation: rise 0.8s cubic-bezier(0.16,1,0.3,1) both; }
+    .resume-header { animation: rise 0.8s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 680px) {
+      .resume-header { grid-template-columns: 1fr; }
+      .resume-contact { text-align: left; }
+      .resume-body { grid-template-columns: 1fr; }
+      .exp-top { flex-direction: column; gap: 0.1rem; }
+    }
+
+    @media print {
+      body { background: white; color: #111; cursor: auto; }
+      .cursor, body::before { display: none; }
+      .top-bar { display: none; }
+      .reveal { opacity: 1; transform: none; }
+      footer { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<div class="site-wrap">
+
+  <div class="top-bar">
+    <a class="back-link" href="index.html">← Back</a>
+    <span class="top-bar-right">Updated 2026</span>
+  </div>
+
+  <div class="resume-header">
+    <div>
+      <div class="resume-name">Chris<span>.</span></div>
+      <div class="resume-title">Full-Stack Developer &amp; Systems Administrator</div>
+    </div>
+    <div class="resume-contact">
+      North Bay, ON, Canada<br>
+      <a href="mailto:Chris.topher.hall@outlook.com">chris.topher.hall@outlook.com</a><br>
+      <a href="https://github.com/ambival3nt" target="_blank">https://github.com/ambival3nt</a><br>
+      <a href="https://www.linkedin.com/in/christopher-hall-a7a338110" target="_blank">https://www.linkedin.com/in/christopher-hall-a7a338110</a>
+    </div>
+  </div>
+
+  <div class="resume-body">
+
+    <!-- ─── Main column ─── -->
+    <main>
+
+      <div class="section reveal">
+        <div class="section-head">Experience</div>
+
+        <div class="exp-entry">
+          <div class="exp-top">
+            <span class="exp-role">Full-Stack Developer / Systems Administrator</span>
+            <span class="exp-date">2019 — 2023</span>
+          </div>
+          <div class="exp-company">Verifast / Tire Wizard</div>
+          <ul class="exp-bullets">
+            <li>Built and maintained internal web applications in PHP/Laravel and Vue.js serving multi-location automotive retail operations.</li>
+            <li>Administered Linux and Windows Server environments including deployment pipelines, backups, and network configuration.</li>
+            <li>Led database design and optimization in PostgreSQL; reduced query times on key reporting dashboards by over 60%.</li>
+            <li>Onboarded and trained junior staff on internal tooling and development workflows.</li>
+          </ul>
+        </div>
+
+        <div class="exp-entry">
+          <div class="exp-top">
+            <span class="exp-role">Software Developer</span>
+            <span class="exp-date">2017 — 2019</span>
+          </div>
+          <div class="exp-company">Metal Fab</div>
+          <ul class="exp-bullets">
+            <li>Developed custom inventory and job-tracking software integrated with shop floor operations.</li>
+            <li>Built automated reporting tools in Python that replaced manual spreadsheet workflows.</li>
+            <li>Maintained Windows Server infrastructure and user systems across two facilities.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section reveal">
+        <div class="section-head">Projects</div>
+
+        <div class="proj-entry">
+          <div class="proj-top">
+            <span class="proj-name">HeroTube</span>
+            <a class="proj-link" href="https://herotube.baby" target="_blank">herotube.baby ↗</a>
+          </div>
+          <p class="proj-desc">Browser-based rhythm game converting YouTube links to playable band tracks. Human-in-the-loop beatmap generation via Gemini API with community fine-tuning pipeline. React, Firebase, Node.js.</p>
+        </div>
+
+        <div class="proj-entry">
+          <div class="proj-top">
+            <span class="proj-name">Butter</span>
+            <a class="proj-link" href="http://fluster.onrender.com" target="_blank">fluster.onrender.com ↗</a>
+          </div>
+          <p class="proj-desc">Flutter demo distribution tool. Automates multi-platform builds via GitHub Actions; serves device-appropriate builds from a single link. Tiered SaaS pricing model. Flutter, Node.js, Firebase.</p>
+        </div>
+
+        <div class="proj-entry">
+          <div class="proj-top">
+            <span class="proj-name">Riff</span>
+            <span class="proj-link" style="opacity:0.3;">In development</span>
+          </div>
+          <p class="proj-desc">Flutter-based digital busking and livestreaming platform with integrated Stripe tipping. WebRTC, Firebase, Flutter.</p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ─── Sidebar ─── -->
+    <aside class="sidebar">
+
+      <div class="section reveal">
+        <div class="section-head">Skills</div>
+
+        <div class="skill-group">
+          <div class="skill-group-label">Frontend</div>
+          <div class="skill-list">
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">Vue.js</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Flutter</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-group-label">Backend</div>
+          <div class="skill-list">
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">PHP</span>
+            <span class="skill-tag">Laravel</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-group-label">Data &amp; Cloud</div>
+          <div class="skill-list">
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">Firebase</span>
+            <span class="skill-tag">MySQL</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-group-label">Systems</div>
+          <div class="skill-list">
+            <span class="skill-tag">Linux</span>
+            <span class="skill-tag">Windows Server</span>
+            <span class="skill-tag">GitHub Actions</span>
+            <span class="skill-tag">Docker</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section reveal">
+        <div class="section-head">Education</div>
+
+        <div class="edu-entry">
+          <div class="edu-degree">B.Sc. Computer Science</div>
+          <div class="edu-school">Nipissing University</div>
+        </div>
+
+        <div class="edu-entry">
+          <div class="edu-degree">B.A. Sociology</div>
+          <div class="edu-school">Nipissing University</div>
+        </div>
+      </div>
+
+      <div class="section reveal">
+        <div class="section-head">Certifications</div>
+        <div class="cert-entry">
+          Advanced Industrial Robotics<br>
+          Yaskawa Academy
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <footer>
+    <p>© 2026 binary.psychiatry</p>
+    <p>chris.topher.hall@outlook.com</p>
+  </footer>
+
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
